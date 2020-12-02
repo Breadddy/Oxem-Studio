@@ -1,76 +1,56 @@
 <?php
-class cow {
-    private $milk;
+abstract class animal{
     private $id;
-    public function generateMilk()
-    {
-        $this->milk=rand(8,12);
-    }
+    protected $product;
     function __construct($id){
         $this->id=$id;
     }
-    public function getMilk()
+    public function getProduction()
     {
-        return $this->milk;
+        return $this->product;
+    }
+    abstract function generateProduction();
+}
+class cow extends animal{
+    public function generateProduction()
+    {
+        $this->product=rand(8,12);
     }
 }
-class chicken {
-    private $egg;
-    private $id;
-    public function generateEggs()
+class chicken extends animal{
+    public function generateProduction()
     {
-        $this->egg=rand(0,1);
-    }
-    function __construct($id){
-        $this->id=$id;
-    }
-    public function getEggs()
-    {
-        return $this->egg;
+        $this->product=rand(0,1);
     }
 }
 class barn{
-    public $Barn, $kMilk, $kEggs;
-    function __construct(){
-        for ($i=0; $i<10; $i++) //добавляем в хлев коров
-        {
-            $id=uniqid(rand(), true);
-            $this->Barn['Cows'][$id]=new cow($id);
-        }
-        for ($i=0; $i<20; $i++) //добавляем в хлев куриц
-        {
-            $id=uniqid(rand(), true);
-            $this->Barn['Chickens'][$id]=new chicken($id);
-        }
+    public $Barn;
+
+    function addAnimals(int $count, string $className)
+    {
+        if(class_exists($className))
+            for ($i=0; $i<$count; $i++) //добавляем в хлев животных
+            {
+                $id=uniqid(rand(), true);
+                $this->Barn[$className][$id]=new $className($id);
+            }
     }
     function getProduce()
     {
-        foreach ($this->Barn['Cows'] as $animal)
+        foreach ($this->Barn as $animal)
         {
-            $animal->generateMilk();
-        }
-        foreach ($this->Barn['Chickens'] as $animal)
-        {
-            $animal->generateEggs();
+            foreach ($animal as $beast)
+            $beast->generateProduction();
         }
     }
-    function countProduce(){
-        foreach ($this->Barn['Cows'] as $animal)
-        {
-            $this->kMilk+=$animal->getMilk();
-        }
-        foreach ($this->Barn['Chickens'] as $animal)
-        {
-            $this->kEggs+=$animal->getEggs();
-        }
-    }
-    function getAllMilk()
+    function countAnimalProduce(string $className)
     {
-        return $this->kMilk;
-    }
-    function getAllEggs()
-    {
-        return $this->kEggs;
+        $r=null;
+        foreach ($this->Barn[$className] as $animal)
+        {
+            $r+=$animal->getProduction();
+        }
+        return $r;
     }
 }
 
